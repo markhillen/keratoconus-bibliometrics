@@ -58,7 +58,7 @@ The pipeline runs the full analysis for six overlapping time windows from a sing
 ## Installation
 
 ```bash
-git clone https://github.com/YOUR_ORG/keratoconus-bibliometrics.git
+git clone https://github.com/markhillen/keratoconus-bibliometrics.git
 cd keratoconus-bibliometrics
 pip install -r requirements.txt
 ```
@@ -150,7 +150,13 @@ Known family pairs and same-name collisions in the keratoconus literature are pr
 
 If you use this pipeline in published research, please cite:
 
-> [Authors]. Global Research Trends in Keratoconus: A Comprehensive Bibliometric Analysis of the Scientific Literature. *Cornea*. [in preparation].
+> [Authors]. Global Research Trends in Keratoconus: A Comprehensive Bibliometric Analysis of the Scientific Literature. *Contact Lens & Anterior Eye*. [in preparation].
+
+---
+
+## Repository
+
+https://github.com/markhillen/keratoconus-bibliometrics
 
 ---
 
