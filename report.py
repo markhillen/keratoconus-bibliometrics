@@ -156,13 +156,43 @@ def generate_reports(results: dict):
                  for i, r in enumerate(results["institutions"][:50])]
     _write_csv("institutions_top.csv", ["rank", "institution", "publications"], inst_rows)
 
+    # ── Languages ──────────────────────────────────────────────────────────
+    _LANG_NAMES = {
+        "eng": "English",    "ger": "German",     "rus": "Russian",
+        "chi": "Chinese",    "fre": "French",     "rum": "Romanian",
+        "heb": "Hebrew",     "cze": "Czech",      "por": "Portuguese",
+        "dut": "Dutch",      "hun": "Hungarian",  "pol": "Polish",
+        "ita": "Italian",    "slo": "Slovak",     "spa": "Spanish",
+        "tur": "Turkish",    "kor": "Korean",     "jpn": "Japanese",
+        "ara": "Arabic",     "per": "Persian",
+    }
+    lang_data = results.get("languages", {})
+    lang_rows = [
+        {"rank": r, "code": code, "language": _LANG_NAMES.get(code, code), "n": n}
+        for r, (code, n) in enumerate(
+            sorted(lang_data.items(), key=lambda x: x[1], reverse=True), 1
+        )
+    ]
+    _write_csv("languages.csv", ["rank", "code", "language", "n"], lang_rows)
+
+    # ── Publication types ─────────────────────────────────────────────────
+    pub_type_data = results.get("pub_types", {})
+    pub_type_rows = [
+        {"publication_type": pt, "n": n}
+        for pt, n in sorted(pub_type_data.items(), key=lambda x: x[1], reverse=True)
+    ]
+    _write_csv("pub_types.csv", ["publication_type", "n"], pub_type_rows)
+
+
     # ── Excel workbook ─────────────────────────────────────────────────────
     _write_excel(results, summary_rows, temporal_rows, author_rows,
-                 journal_rows, country_rows, kw_rows, mesh_rows, inst_rows)
+                 journal_rows, country_rows, kw_rows, mesh_rows, inst_rows,
+                 lang_rows, pub_type_rows)
 
 
 def _write_excel(results, summary_rows, temporal_rows, author_rows,
-                 journal_rows, country_rows, kw_rows, mesh_rows, inst_rows):
+                 journal_rows, country_rows, kw_rows, mesh_rows, inst_rows,
+                 lang_rows=None, pub_type_rows=None):
     """Write multi-sheet Excel workbook using openpyxl if available, else skip."""
     try:
         import openpyxl
@@ -225,6 +255,10 @@ def _write_excel(results, summary_rows, temporal_rows, author_rows,
     _add_sheet(wb, "Keywords",     ["rank", "keyword", "frequency"],            kw_rows)
     _add_sheet(wb, "MeSH Terms",   ["rank", "mesh_term", "frequency"],          mesh_rows)
     _add_sheet(wb, "Institutions", ["rank", "institution", "publications"],     inst_rows)
+    if lang_rows:
+        _add_sheet(wb, "Languages",    ["rank", "code", "language", "n"],          lang_rows)
+    if pub_type_rows:
+        _add_sheet(wb, "Pub Types",    ["publication_type", "n"],                  pub_type_rows)
 
     path = pathlib.Path(config.OUTPUT_DIR) / "keratoconus_bibliometrics.xlsx"
     wb.save(path)
