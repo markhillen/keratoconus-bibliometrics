@@ -180,7 +180,7 @@ def country_stats(records: list[dict]) -> list[dict]:
     Countries absent from the lookup table receive pubs_per_million = None.
     """
     # 2024 UN population estimates (millions), covering all countries likely
-    # to appear in the CXL literature.
+    # to appear in the keratoconus literature.
     _POP_MILLIONS: dict[str, float] = {
         "Australia":       26.5,
         "Austria":          9.1,
@@ -323,11 +323,12 @@ _KW_SYNONYMS: dict[str, str] = {
     "trans-epithelial cxl":                     "epi-on CXL (transepithelial)",
     "iontophoresis cxl":                        "epi-on CXL (transepithelial)",
 
-    # ── PACK-CXL variants ────────────────────────────────────────────────────
-    "pack-cxl":                                 "PACK-CXL",
-    "pack cxl":                                 "PACK-CXL",
-    "photoactivated chromophore":               "PACK-CXL",
-    "photoactivated chromophore for keratitis": "PACK-CXL",
+    # ── PACK-CXL / infectious keratitis ──────────────────────────────────────
+    # NOTE: PACK-CXL treats infectious keratitis, not keratoconus/ectasia.
+    # These terms are NOT canonical keywords for the keratoconus literature.
+    # Papers mentioning PACK-CXL only are excluded by the fetch relevance filter.
+    # Any that remain (e.g. papers discussing CXL mechanism broadly) will appear
+    # under the general CXL synonym group above, which is appropriate.
 
     # ── Keratoconus variants ─────────────────────────────────────────────────
     "keratoconus":                              "keratoconus",
@@ -336,14 +337,48 @@ _KW_SYNONYMS: dict[str, str] = {
     "paediatric keratoconus":                   "paediatric keratoconus",
     "childhood keratoconus":                    "paediatric keratoconus",
 
-    # ── Cornea / ectasia variants ────────────────────────────────────────────
+    # ── Corneal ectasia variants ──────────────────────────────────────────────
+    # All clinical variants of the ectasia disease spectrum
     "corneal ectasia":                          "corneal ectasia",
     "ectasia":                                  "corneal ectasia",
+    "keratectasia":                             "corneal ectasia",
+    "ectatic corneal disease":                  "corneal ectasia",
+    "corneal ectatic disease":                  "corneal ectatic disease",
+
+    # Post-refractive ectasia
     "post-lasik ectasia":                       "post-refractive ectasia",
     "post lasik ectasia":                       "post-refractive ectasia",
+    "post-refractive ectasia":                  "post-refractive ectasia",
+    "post refractive ectasia":                  "post-refractive ectasia",
+    "post-surgical ectasia":                    "post-refractive ectasia",
+    "post surgical ectasia":                    "post-refractive ectasia",
     "iatrogenic ectasia":                       "post-refractive ectasia",
-    "pellucid marginal degeneration":           "pellucid marginal degeneration",
-    "pmd":                                      "pellucid marginal degeneration",
+    "ectasia after lasik":                      "post-refractive ectasia",
+    "ectasia after refractive surgery":         "post-refractive ectasia",
+    "laser in situ keratomileusis ectasia":     "post-refractive ectasia",
+
+    # Pellucid marginal degeneration
+    "pellucid marginal degeneration":           "pellucid marginal degeneration (PMD)",
+    "pellucid marginal corneal degeneration":   "pellucid marginal degeneration (PMD)",
+    "pmd":                                      "pellucid marginal degeneration (PMD)",
+    "pellucid":                                 "pellucid marginal degeneration (PMD)",
+
+    # Keratoglobus
+    "keratoglobus":                             "keratoglobus",
+    "kerato-globus":                            "keratoglobus",
+
+    # Forme fruste / subclinical keratoconus
+    "forme fruste keratoconus":                 "forme fruste / subclinical keratoconus",
+    "forme fruste":                             "forme fruste / subclinical keratoconus",
+    "subclinical keratoconus":                  "forme fruste / subclinical keratoconus",
+    "suspected keratoconus":                    "forme fruste / subclinical keratoconus",
+    "keratoconus suspect":                      "forme fruste / subclinical keratoconus",
+    "keratoconus susceptibility":               "forme fruste / subclinical keratoconus",
+    "pre-clinical keratoconus":                 "forme fruste / subclinical keratoconus",
+    "preclinical keratoconus":                  "forme fruste / subclinical keratoconus",
+
+    # Posterior keratoconus
+    "posterior keratoconus":                    "posterior keratoconus",
 
     # ── Riboflavin/UVA — keep as clinical concept, not just procedural label ─
     "riboflavin":                               "riboflavin",

@@ -20,8 +20,12 @@ import numpy as np
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 import config
 
-OUT = pathlib.Path(config.OUTPUT_DIR)
-OUT.mkdir(parents=True, exist_ok=True)
+def _out_dir() -> pathlib.Path:
+    """Return current output dir — evaluated at call time so period overrides work."""
+    p = pathlib.Path(config.OUTPUT_DIR)
+    p.mkdir(parents=True, exist_ok=True)
+    return p
+    # Output dir created on demand by _out_dir()
 
 # ── Style ─────────────────────────────────────────────────────────────────────
 plt.rcParams.update({
@@ -40,8 +44,16 @@ PALETTE = ["#2C6FAC", "#E05C1B", "#3A9E6B", "#9B59B6",
 
 
 def _save(fig, name: str):
-    path = OUT / name
-    fig.savefig(path, bbox_inches="tight", dpi=150)
+    # Replace extension with configured format
+    fmt  = getattr(config, "FIGURE_FORMAT", "pdf")
+    stem = pathlib.Path(name).stem
+    fname = f"{stem}.{fmt}"
+    path  = _out_dir() / fname
+    kwargs = {"bbox_inches": "tight"}
+    if fmt == "png":
+        kwargs["dpi"] = 300           # high-dpi raster only
+    # PDF and SVG are vector — dpi argument is ignored/irrelevant
+    fig.savefig(path, **kwargs)
     plt.close(fig)
     print(f"  saved: {path.name}")
 
@@ -59,7 +71,7 @@ def plot_temporal(temporal: dict):
 
     # Panel 1: annual + moving average + cumulative
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
-    fig.suptitle("CXL Publications Over Time", fontsize=14, fontweight="bold")
+    fig.suptitle("Keratoconus & Corneal Ectasia Publications Over Time", fontsize=14, fontweight="bold")
 
     ax1.bar(years, counts, color=PALETTE[0], alpha=0.7, label="Annual publications")
     ax1.plot(years, mavg, color=PALETTE[1], linewidth=2.5,
@@ -79,7 +91,7 @@ def plot_temporal(temporal: dict):
     ax2.legend(loc="upper left", fontsize=9)
 
     plt.tight_layout()
-    _save(fig, "fig1_temporal_trends.png")
+    _save(fig, "fig1_temporal_trends.pdf")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -100,14 +112,14 @@ def plot_journals(journals: list[dict], top_n: int = None):
     ax.set_yticklabels(labels, fontsize=9)
     ax.invert_yaxis()
     ax.set_xlabel("Number of publications")
-    ax.set_title(f"Top {top_n} Journals Publishing CXL Research", fontweight="bold")
+    ax.set_title(f"Top {top_n} Journals Publishing Keratoconus Research", fontweight="bold")
 
     for bar, pct in zip(bars, pcts):
         ax.text(bar.get_width() + counts[0] * 0.01, bar.get_y() + bar.get_height() / 2,
                 f"{pct:.1f}%", va="center", fontsize=8, color="gray")
 
     plt.tight_layout()
-    _save(fig, "fig2_top_journals.png")
+    _save(fig, "fig2_top_journals.pdf")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -131,7 +143,7 @@ def plot_countries(countries: list[dict], top_n: int = None):
     fig, axes = plt.subplots(1, ncols, figsize=(6 * ncols, max(6, top_n * 0.33)))
     if ncols == 1:
         axes = [axes]
-    fig.suptitle(f"Top {top_n} Countries in CXL Research", fontsize=13, fontweight="bold")
+    fig.suptitle(f"Top {top_n} Countries in Keratoconus Research", fontsize=13, fontweight="bold")
 
     y = range(len(labels))
 
@@ -202,7 +214,7 @@ def plot_countries(countries: list[dict], top_n: int = None):
                 )
 
     plt.tight_layout()
-    _save(fig, "fig3_top_countries.png")
+    _save(fig, "fig3_top_countries.pdf")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -223,7 +235,7 @@ def plot_authors(authors: list[dict], top_n: int = 25):
     fig, axes = plt.subplots(1, ncols, figsize=(7 * ncols, max(6, top_n * 0.35)))
     if ncols == 1:
         axes = [axes]
-    fig.suptitle(f"Top {top_n} Most Productive Authors", fontsize=13, fontweight="bold")
+    fig.suptitle(f"Top {top_n} Most Productive Authors — Keratoconus Research", fontsize=13, fontweight="bold")
 
     y = np.arange(len(labels))
 
@@ -263,7 +275,7 @@ def plot_authors(authors: list[dict], top_n: int = 25):
                          f"{ratios[i]:.1f}", va="center", fontsize=7)
 
     plt.tight_layout()
-    _save(fig, "fig4_top_authors.png")
+    _save(fig, "fig4_top_authors.pdf")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -288,7 +300,7 @@ def plot_keywords(kw_data: dict, top_n: int = None, title_suffix: str = ""):
     ax.set_title(f"Top {top_n} Keywords {title_suffix}", fontweight="bold")
     plt.tight_layout()
     safe = title_suffix.replace("(","").replace(")","").replace(" ","_").lower()
-    fname = f"fig5_{safe}.png" if title_suffix else "fig5_keywords.png"
+    fname = f"fig5_{safe}.pdf" if title_suffix else "fig5_keywords.pdf"
     _save(fig, fname)
 
 
@@ -327,7 +339,7 @@ def plot_pubtypes(pub_types: dict):
               loc="center left", bbox_to_anchor=(1, 0, 0.5, 1), fontsize=9)
     ax.set_title("Publication Types", fontweight="bold")
     plt.tight_layout()
-    _save(fig, "fig6_pub_types.png")
+    _save(fig, "fig6_pub_types.pdf")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -369,7 +381,7 @@ def plot_country_collab(country_net: dict, top_n: int = 20):
                         ha="center", va="center", fontsize=6,
                         color="black" if matrix[i][j] < matrix.max() * 0.5 else "white")
     plt.tight_layout()
-    _save(fig, "fig7_country_collab.png")
+    _save(fig, "fig7_country_collab.pdf")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -463,7 +475,7 @@ def plot_keyword_trends(records: list[dict], top_keywords: list[str], n: int = 1
     )
 
     plt.tight_layout()
-    _save(fig, "fig8_keyword_trends.png")
+    _save(fig, "fig8_keyword_trends.pdf")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -483,7 +495,7 @@ def plot_institutions(institutions: list[dict], top_n: int = 20):
     if ncols == 1:
         axes = [axes]
     fig.suptitle(
-        f"Top {top_n} Institutions in CXL Research (first-author attribution)",
+        f"Top {top_n} Institutions in Keratoconus Research (first-author attribution)",
         fontsize=13, fontweight="bold"
     )
     fig.text(0.5, 0.97,
@@ -521,7 +533,7 @@ def plot_institutions(institutions: list[dict], top_n: int = 20):
                          f"{ratios[i]:.1f}", va="center", fontsize=7)
 
     plt.tight_layout()
-    _save(fig, "fig9_institutions.png")
+    _save(fig, "fig9_institutions.pdf")
 
     y = range(len(labels))
     axes[0].barh(list(y), counts, color=PALETTE[4], alpha=0.85)
@@ -554,7 +566,7 @@ def plot_institutions(institutions: list[dict], top_n: int = 20):
                          f"{ratios[i]:.1f}", va="center", fontsize=7)
 
     plt.tight_layout()
-    _save(fig, "fig9_institutions.png")
+    _save(fig, "fig9_institutions.pdf")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -725,7 +737,7 @@ def plot_author_network(auth_net: dict, top_n: int = 30):
     )
     ax.axis("off")
     plt.tight_layout()
-    _save(fig, "fig10_author_network.png")
+    _save(fig, "fig10_author_network.pdf")
 
 
 

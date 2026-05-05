@@ -78,6 +78,7 @@ CITATION_BATCH_DELAY = 0.5
 
 # ── Co-occurrence / Network ────────────────────────────────────────────────────
 MIN_KEYWORD_FREQ = 10    # higher than CXL — keratoconus corpus is larger
+MIN_COOCCURRENCE = 10    # alias used by analyze.py keyword co-occurrence filter
 
 # ── Output ────────────────────────────────────────────────────────────────────
 TOP_N_AUTHORS      = 25
@@ -85,6 +86,12 @@ TOP_N_COUNTRIES    = 20
 TOP_N_INSTITUTIONS = 20
 TOP_N_JOURNALS     = 20
 TOP_N_KEYWORDS     = 25
+
+# ── Figure format ─────────────────────────────────────────────────────────────
+# "pdf"  — best for journal submission and print (vector, universally supported)
+# "svg"  — best for editing in Illustrator / Inkscape (vector, web-friendly)
+# "png"  — raster fallback (high-dpi only; avoid for publication figures)
+FIGURE_FORMAT = "svg"
 
 OUTPUT_DIR = os.environ.get("KC_OUTPUT_DIR", "output")
 CACHE_DIR  = os.environ.get("KC_CACHE_DIR",  "cache")

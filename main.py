@@ -28,6 +28,14 @@ import pathlib
 import sys
 import time
 
+
+class _SetEncoder(json.JSONEncoder):
+    """Convert sets to sorted lists for JSON serialisation."""
+    def default(self, obj):
+        if isinstance(obj, set):
+            return sorted(obj)
+        return super().default(obj)
+
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
 
@@ -107,10 +115,10 @@ def main():
         print("[main] Author IDs already present — skipping disambiguation")
     else:
         from disambiguate import assign_author_ids
-        records, stats = assign_author_ids(records)
+        records, _ = assign_author_ids(records)
         with open(disamb_path, "w") as f:
-            json.dump(records, f)
-        print(f"[main] {stats.get('unique_authors', '?')} unique authors identified")
+            json.dump(records, f, cls=_SetEncoder)
+        print(f"[main] Disambiguation complete")
 
     # ── Step 3: Country enrichment ────────────────────────────────────────────
     print(f"\n[3/8] Enriching countries …")
@@ -123,14 +131,15 @@ def main():
         from citations import enrich_citations
         records = enrich_citations(records)
         with open(cited_path, "w") as f:
-            json.dump(records, f)
+            json.dump(records, f, cls=_SetEncoder)
     else:
         print("[main] Skipped")
 
     # ── Steps 5–8: Multi-period ───────────────────────────────────────────────
     print(f"\n[5–8/8] Multi-period analysis …")
     from periods import run_all_periods
-    all_results = run_all_periods(records, output_root=config.OUTPUT_DIR)
+    all_results = run_all_periods(records, output_root=config.OUTPUT_DIR,
+                                  skip_viz=args.skip_viz)
 
     elapsed = time.time() - t0
     print()

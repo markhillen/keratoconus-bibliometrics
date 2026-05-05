@@ -29,7 +29,8 @@ def _filter_by_period(records: list[dict], start: int, end: int) -> list[dict]:
     return out
 
 
-def run_all_periods(records: list[dict], output_root: str = None) -> dict:
+def run_all_periods(records: list[dict], output_root: str = None,
+                    skip_viz: bool = False) -> dict:
     """
     Run the full analysis pipeline for every period defined in
     config.ANALYSIS_PERIODS.
@@ -66,8 +67,9 @@ def run_all_periods(records: list[dict], output_root: str = None) -> dict:
 
         try:
             results = analyze.run_analysis(period_records)
-            report.run_report(results, period_records)
-            visualize.run_visualizations(results)
+            report.generate_reports(results)
+            if not skip_viz:
+                visualize.run_visualizations(results)
         finally:
             config.OUTPUT_DIR = _orig
 

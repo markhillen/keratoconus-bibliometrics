@@ -10,7 +10,7 @@ Outputs:
   - mesh_top.csv             — top MeSH terms
   - institutions_top.csv     — top institutions
   - temporal.csv             — year-by-year
-  - cxl_bibliometrics.xlsx   — all of the above as separate sheets
+  - keratoconus_bibliometrics.xlsx   — all of the above as separate sheets
 """
 
 import csv
@@ -226,7 +226,7 @@ def _write_excel(results, summary_rows, temporal_rows, author_rows,
     _add_sheet(wb, "MeSH Terms",   ["rank", "mesh_term", "frequency"],          mesh_rows)
     _add_sheet(wb, "Institutions", ["rank", "institution", "publications"],     inst_rows)
 
-    path = pathlib.Path(config.OUTPUT_DIR) / "cxl_bibliometrics.xlsx"
+    path = pathlib.Path(config.OUTPUT_DIR) / "keratoconus_bibliometrics.xlsx"
     wb.save(path)
     print(f"  wrote: {path.name}")
 

@@ -299,18 +299,37 @@ def is_kc_relevant(rec: dict) -> tuple[bool, str]:
         if any(mkw in m for m in mesh):
             return False, f"Excluded MeSH term: {mkw}"
 
-    # ── 3. Title + abstract must contain at least one ophthalmic term ─────────
-    _OPHTHALMIC_TERMS = (
-        "cornea", "corneal", "keratoconus", "ectasia", "keratitis",
-        "keratectasia", "pellucid", "stroma", "stromal", "epithelium",
-        "epithelial", "endothelium", "endothelial", "ophthalmol", "ocular",
-        "refractive", "topograph", "keratometry", "kmax", "visual acuity",
-        "slit lamp", "anterior segment", "collagen", "bowman", "descemet",
-        "contact lens", "rigid gas", "scleral lens", "intraocular",
-        "keratocyte", "keratoconic", "ectatic", "forme fruste",
+    # ── 3. Title + abstract must contain at least one ECTASIA-SPECIFIC term ──
+    # A paper about keratoconus/ectasia must mention one of these conditions
+    # explicitly. "keratitis" or generic ophthalmic terms alone are NOT
+    # sufficient — this prevents PACK-CXL (infectious keratitis), PDT, and
+    # other corneal infection papers leaking through.
+    _ECTASIA_TERMS = (
+        "keratoconus", "keratoconic", "corneal ectasia", "keratectasia",
+        "ectatic cornea", "ectatic disease", "corneal ectatic",
+        "pellucid marginal", "pellucid marginal degeneration", "pmd",
+        "keratoglobus", "posterior keratoconus", "forme fruste",
+        "post-lasik ectasia", "post lasik ectasia", "post-refractive ectasia",
+        "post refractive ectasia", "iatrogenic ectasia", "ectasia after",
+        "corneal thinning disorder", "corneal biomechanics",
+        "bowman layer", "bowman's layer", "bowman membrane",
+        "stromal thinning", "corneal protrusion", "corneal bulging",
+        "vogt striae", "fleischer ring", "munson sign",
+        "intrastromal corneal ring", "icrs", "intacs", "ferrara ring",
+        "deep anterior lamellar", "dalk", "penetrating keratoplasty",
+        "corneal transplant", "keratoplasty", "corneal graft",
+        "contact lens for kerato", "scleral lens", "rigid gas permeable",
+        "topography-guided", "corneal topography", "scheimpflug",
+        "corneal tomography", "pentacam", "corvis", "ocular response",
+        "collagen cross-link", "corneal cross-link", "crosslink",
+        "kmax", "k-max", "flat k", "steep k", "belin",
+        "amsler", "rabinowitz", "thinnest point", "pachymetry",
+        "corneal pachymetry", "corneal thickness",
+        "genetic", "genome", "gwas", "heritability",
+        "artificial intelligence", "deep learning", "machine learning",
     )
-    if not any(term in combined for term in _OPHTHALMIC_TERMS):
-        return False, "No ophthalmic/corneal term found in title or abstract"
+    if not any(term in combined for term in _ECTASIA_TERMS):
+        return False, "No keratoconus/ectasia-specific term found in title or abstract"
 
     return True, ""
 
