@@ -91,7 +91,7 @@ TOP_N_KEYWORDS     = 25
 # "pdf"  — best for journal submission and print (vector, universally supported)
 # "svg"  — best for editing in Illustrator / Inkscape (vector, web-friendly)
 # "png"  — raster fallback (high-dpi only; avoid for publication figures)
-FIGURE_FORMAT = "svg"
+FIGURE_FORMAT = "pdf"
 
 OUTPUT_DIR = os.environ.get("KC_OUTPUT_DIR", "output")
 CACHE_DIR  = os.environ.get("KC_CACHE_DIR",  "cache")

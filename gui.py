@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-gui.py — CXL Bibliometric Analysis — Local Web GUI
+gui.py — Keratoconus Bibliometric Analysis — Local Web GUI
 ====================================================
 Zero extra dependencies beyond the standard library.
 Launches a local web server and opens the GUI in your browser.
@@ -45,7 +45,7 @@ HTML = r"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CXL Bibliometrics</title>
+<title>Keratoconus Bibliometrics</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,300;9..144,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -635,7 +635,7 @@ HTML = r"""<!DOCTYPE html>
 <body>
 
 <header>
-  <h1>CXL <span>Bibliometrics</span></h1>
+  <h1>Keratoconus <span>Bibliometrics</span></h1>
   <span class="sub">PubMed · CrossRef · VOSviewer-style</span>
   <span class="status-dot" id="status-dot"></span>
 </header>
@@ -697,7 +697,7 @@ HTML = r"""<!DOCTYPE html>
       <div class="field" style="margin-top:.8rem;margin-bottom:.4rem">
         <label>PubMed search query</label>
         <textarea id="pubmed-query" rows="6"
-          placeholder="e.g. &quot;corneal cross-linking&quot;[tiab] AND &quot;keratoconus&quot;[tiab]&#10;&#10;Paste any PubMed query here — the date range sliders above will be appended automatically."
+          placeholder="e.g. keratoconus[tiab] OR &quot;corneal ectasia&quot;[tiab]placeholder="e.g. &quot;corneal cross-linking&quot;[tiab] AND &quot;keratoconus&quot;[tiab]&#10;&#10;Paste any PubMed query here — the date range sliders above will be appended automatically."#10;placeholder="e.g. &quot;corneal cross-linking&quot;[tiab] AND &quot;keratoconus&quot;[tiab]&#10;&#10;Paste any PubMed query here — the date range sliders above will be appended automatically."#10;Paste any PubMed query here — the date range sliders above will be appended automatically."
           oninput="onQueryInput()"
         ></textarea>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.3rem">
@@ -710,7 +710,7 @@ HTML = r"""<!DOCTYPE html>
           🔍 Count results
         </button>
         <button class="action-btn secondary" onclick="loadExampleQuery()">
-          ↙ CXL example
+          ↙ KC example
         </button>
       </div>
       <div id="query-count-result" style="display:none"></div>
@@ -1315,10 +1315,10 @@ function refreshCacheInfo() {
 }
 
 // ── Query input / validation ────────────────────────────────────────────────
-const CXL_EXAMPLE_QUERY = `("corneal cross-linking"[tiab] OR "corneal crosslinking"[tiab] OR "corneal collagen cross-linking"[tiab] OR "riboflavin ultraviolet"[tiab] OR "PACK-CXL"[tiab] OR "Corneal Cross-Linking"[MeSH Terms]) AND ("cornea"[tiab] OR "keratoconus"[tiab] OR "ectasia"[tiab] OR "keratitis"[tiab] OR "cornea"[MeSH Terms]) NOT ("cartilage"[tiab] OR "dental"[tiab] OR "bone"[tiab] OR "hydrogel"[tiab] OR "polymer"[tiab])`;
+const KC_EXAMPLE_QUERY = `("keratoconus"[tiab] OR "keratoconus"[MeSH Terms] OR "corneal ectasia"[tiab] OR "keratectasia"[tiab] OR "pellucid marginal degeneration"[tiab] OR "forme fruste keratoconus"[tiab]) NOT ("cartilage"[tiab] OR "polymer"[tiab] OR "hydrogel"[tiab] OR "scaffold"[tiab] OR "bone"[tiab] OR "dental"[tiab])`;
 
 function loadExampleQuery() {
-  document.getElementById('pubmed-query').value = CXL_EXAMPLE_QUERY;
+  document.getElementById('pubmed-query').value = KC_EXAMPLE_QUERY;
   onQueryInput();
 }
 
@@ -1756,7 +1756,7 @@ def main():
 
     print(f"""
 ╔══════════════════════════════════════════════════╗
-║     CXL Bibliometrics — Local Web GUI            ║
+║     Keratoconus Bibliometrics — Local Web GUI            ║
 ╠══════════════════════════════════════════════════╣
 ║  Server: {url:<40}║
 ║  Press Ctrl+C to quit                            ║
