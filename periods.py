@@ -73,6 +73,16 @@ def run_all_periods(records: list[dict], output_root: str = None,
         finally:
             config.OUTPUT_DIR = _orig
 
+        # Field-level h-index: largest h s.t. ≥h papers each have ≥h citations.
+        # Must be computed here while per-paper records are still in scope.
+        cite_counts = sorted(
+            [r.get("citation_count") or 0 for r in period_records],
+            reverse=True,
+        )
+        results["h_index_field"] = sum(
+            1 for i, c in enumerate(cite_counts, 1) if c >= i
+        )
+
         results["_period"] = {"label": label, "start": start, "end": end, "n": n}
         all_results[label] = results
 
@@ -89,18 +99,19 @@ def _write_period_summary(all_results: dict, output_root: str) -> None:
     rows = []
     for label, res in all_results.items():
         p = res.get("_period", {})
-        summary = res.get("summary", {})
+        n_records = res.get("n_records", 0)
+        total_cites = sum(res.get("temporal", {}).get("citations", []))
         rows.append({
             "period":              label,
             "start_year":          p.get("start", ""),
             "end_year":            p.get("end", ""),
             "total_publications":  p.get("n", ""),
-            "total_citations":     summary.get("total_citations", ""),
-            "unique_authors":      summary.get("unique_authors", ""),
-            "unique_journals":     summary.get("unique_journals", ""),
-            "unique_countries":    summary.get("unique_countries", ""),
-            "mean_cites_per_pub":  summary.get("mean_cites_per_pub", ""),
-            "h_index_field":       summary.get("h_index_field", ""),
+            "total_citations":     total_cites,
+            "unique_authors":      len(res.get("authors", [])),
+            "unique_journals":     len(res.get("journals", [])),
+            "unique_countries":    len(res.get("countries", [])),
+            "mean_cites_per_pub":  round(total_cites / n_records, 2) if n_records else "",
+            "h_index_field":       res.get("h_index_field", ""),
         })
 
     outpath = pathlib.Path(output_root) / "period_comparison.csv"
