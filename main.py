@@ -50,14 +50,48 @@ def main():
     parser.add_argument("--skip-fetch",     action="store_true", help="Use cached records only")
     parser.add_argument("--skip-citations", action="store_true", help="Skip CrossRef lookup")
     parser.add_argument("--skip-viz",       action="store_true", help="Skip chart generation")
-    parser.add_argument("--period",         default="",   help="Single period label to run")
+    parser.add_argument("--period",         default="",
+                        help="Run a single period only (e.g. all_time, last_10yr)")
+    parser.add_argument("--start-year",     type=int, default=None,
+                        help="Override ALL_TIME_START in config")
+    parser.add_argument("--end-year",       type=int, default=None,
+                        help="Override END_YEAR in config")
     args = parser.parse_args()
+
+    # ── Verify dependencies before doing any work ──────────────────────────────
+    try:
+        import check_deps
+        if check_deps.check():
+            sys.exit(1)
+    except ImportError:
+        pass  # check_deps.py not present — proceed and let imports fail naturally
 
     import config
     if args.api_key:
         config.NCBI_API_KEY = args.api_key
     if args.skip_citations:
         config.FETCH_CITATIONS = False
+
+    # ── Config overrides ───────────────────────────────────────────────────────
+    if args.start_year is not None:
+        config.ALL_TIME_START = args.start_year
+        config.START_YEAR     = args.start_year
+    if args.end_year is not None:
+        config.END_YEAR = args.end_year
+
+    # Rebuild periods if date overrides were applied
+    if args.start_year is not None or args.end_year is not None:
+        s = config.ALL_TIME_START
+        e = config.END_YEAR
+        config.ANALYSIS_PERIODS = [
+            ("all_time",  s,      e),
+            ("last_25yr", e - 24, e),
+            ("last_20yr", e - 19, e),
+            ("last_15yr", e - 14, e),
+            ("last_10yr", e - 9,  e),
+            ("last_5yr",  e - 4,  e),
+        ]
+
     if args.period:
         config.ANALYSIS_PERIODS = [p for p in config.ANALYSIS_PERIODS if p[0] == args.period]
         if not config.ANALYSIS_PERIODS:
