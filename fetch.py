@@ -53,6 +53,9 @@ def esearch(query: str, retmax: int = 100_000, api_key: str = "") -> list[str]:
     pmids = data["esearchresult"]["idlist"]
     total = int(data["esearchresult"]["count"])
     print(f"[esearch] Found {total} total records; retrieved {len(pmids)} PMIDs")
+    if total > retmax:
+        print(f"[esearch] WARNING: corpus ({total}) exceeds retmax ({retmax}) — "
+              f"{total - len(pmids)} records silently dropped. Increase retmax or use a PMID file.")
     return pmids
 
 
@@ -182,9 +185,10 @@ def _parse_pubmed_xml(xml_text: str) -> list[dict]:
 
         # ── Authors ───────────────────────────────────────────────────────
         authors = [
-            _parse_author(a)
+            parsed
             for a in article.findall(".//AuthorList/Author")
-            if _parse_author(a)["last"] or _parse_author(a)["collective"]
+            for parsed in [_parse_author(a)]
+            if parsed["last"] or parsed["collective"]
         ]
 
         # ── Affiliation fallbacks for legacy PubMed record formats ────────
@@ -380,8 +384,11 @@ def run_fetch(api_key: str = "", force_refresh: bool = False) -> list[dict]:
     records = efetch_batch(pmids, api_key=api_key)
     records = filter_records(records)
 
-    with open(cache_path, "w") as f:
+    tmp = cache_path.with_suffix(".tmp")
+    with open(tmp, "w") as f:
         json.dump(records, f, indent=2)
+    import os as _os
+    _os.replace(tmp, cache_path)
     print(f"[fetch] Saved {len(records)} records to {cache_path}")
     return records
 
@@ -432,7 +439,10 @@ def run_fetch_from_pmids(pmid_file: str, api_key: str = "",
     records = efetch_batch(pmids, api_key=api_key)
     records = filter_records(records)
 
-    with open(cache_path, "w") as f:
+    tmp = cache_path.with_suffix(".tmp")
+    with open(tmp, "w") as f:
         json.dump(records, f, indent=2)
+    import os as _os
+    _os.replace(tmp, cache_path)
     print(f"[fetch] Saved {len(records)} records to {cache_path}")
     return records
