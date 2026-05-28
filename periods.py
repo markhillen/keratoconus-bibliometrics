@@ -70,6 +70,10 @@ def run_all_periods(records: list[dict], output_root: str = None,
             report.generate_reports(results)
             if not skip_viz:
                 visualize.run_visualizations(results)
+            # Write per-period analysis.json so the GUI's /api/results?period=X can serve it
+            import json as _json
+            with open(period_dir / "analysis.json", "w") as _f:
+                _json.dump(results, _f, default=str)
         finally:
             config.OUTPUT_DIR = _orig
 
